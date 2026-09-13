@@ -18,11 +18,24 @@
 - [x] implement deterministic host test transport
 - [x] establish memory/allocation instrumentation
 - [x] add 68000 cross-compile CI smoke build
-- [ ] pin reviewed BearSSL source revision before functional TLS integration
+- [x] fix 68000 CI smoke build directory dependency
 
 ## M2 — TLS client handshake
 
-- [ ] pin/vendor reviewed BearSSL revision with provenance and integrity hash
+### M2.0 — Backend provenance gate
+
+- [x] establish canonical-backend provenance policy
+- [x] add machine-checked backend lock format
+- [x] explicitly reject moving/unreviewed refs for functional TLS integration
+- [x] record why BearSSL v0.6 is not automatically acceptable (upstream fixes continued after release)
+- [ ] resolve and review exact current upstream BearSSL commit
+- [ ] pin immutable 40-hex commit and reviewed archive SHA-256
+- [ ] vendor reviewed source subset with original license intact
+- [ ] host crypto/X.509 qualification of pinned backend
+- [ ] 68000 compile qualification of selected backend subset
+
+### M2.1 — Functional TLS client
+
 - [ ] TLS client state machine
 - [ ] SNI/server-name handling
 - [ ] CA trust loading strategy suitable for classic Amiga
