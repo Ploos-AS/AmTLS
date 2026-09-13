@@ -13,3 +13,12 @@ jobs:
         run: make
       - name: Test
         run: make check
+
+  m68k-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install m68k cross compiler
+        run: sudo apt-get update && sudo apt-get install -y gcc-m68k-linux-gnu
+      - name: Compile 68000 objects
+        run: make CC=m68k-linux-gnu-gcc smoke-68000
