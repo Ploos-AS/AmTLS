@@ -1,0 +1,15 @@
+# AmTLS backend source lock
+#
+# M2.0 deliberately refuses to treat an unreviewed or moving upstream ref as
+# production input. The official BearSSL repository has commits newer than
+# release v0.6, including fixes in April 2026, so v0.6 is not accepted merely
+# because it is the latest numbered release.
+#
+# Fill the immutable commit and archive SHA-256 only after source review.
+name=BearSSL
+upstream=https://www.bearssl.org/git/BearSSL
+candidate=master-as-of-2026-04-06
+commit=UNREVIEWED
+archive_sha256=UNREVIEWED
+license=MIT
+status=blocked-pending-review
