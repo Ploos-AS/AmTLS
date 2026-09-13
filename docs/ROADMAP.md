@@ -12,15 +12,17 @@
 
 ## M1 — Backend and transport foundation
 
-- [ ] define internal TLS backend interface
-- [ ] evaluate and pin compact TLS backend (BearSSL first candidate)
-- [ ] define transport callback API
-- [ ] implement deterministic host test transport
-- [ ] establish memory/allocation instrumentation
-- [ ] add 68000 cross-compile CI smoke build
+- [x] define internal TLS backend interface
+- [x] evaluate compact TLS backend architecture (BearSSL first candidate)
+- [x] define transport callback API
+- [x] implement deterministic host test transport
+- [x] establish memory/allocation instrumentation
+- [x] add 68000 cross-compile CI smoke build
+- [ ] pin reviewed BearSSL source revision before functional TLS integration
 
 ## M2 — TLS client handshake
 
+- [ ] pin/vendor reviewed BearSSL revision with provenance and integrity hash
 - [ ] TLS client state machine
 - [ ] SNI/server-name handling
 - [ ] CA trust loading strategy suitable for classic Amiga
@@ -36,13 +38,15 @@
 - [ ] FS-UAE/AROS initial runtime qualification where feasible
 - [ ] local AmigaOS 2.04+ qualification
 
-## M4 — CLI toolkit
+## M4 — CLI toolkit and ARexx automation
 
 - [ ] TLSInfo
 - [ ] TLSConnect
 - [ ] TLSGet / HTTPS GET
 - [ ] TLSBench
-- [ ] ARexx integration where useful
+- [ ] optional ARexx command layer outside the TLS core
+- [ ] `INFO`, `CONNECT`, `GET`, `CERTINFO`, `STATUS`, `VERSION` and `BENCH` commands where applicable
+- [ ] documented RC/RESULT2 behavior and example scripts
 
 ## M5 — Efficiency qualification
 
