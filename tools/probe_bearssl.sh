@@ -28,6 +28,10 @@ printf 'BEARSSL_COMMIT_DATE=%s\n' "$DATE"
 printf 'BEARSSL_SUBJECT=%s\n' "$SUBJECT"
 printf 'BEARSSL_GIT_ARCHIVE_SHA256=%s\n' "$ARCHIVE_SHA256"
 
+printf '%s\n' 'BEARSSL_SOURCE_INVENTORY_BEGIN'
+git ls-files | grep -E '(^|/)([^/]*(i15|sha2|p256|x509|ssl)[^/]*)\.c$' | head -100 || true
+printf '%s\n' 'BEARSSL_SOURCE_INVENTORY_END'
+
 find_source() {
     name=$1
     git ls-files | awk -v n="$name" '$0 == n || $0 ~ ("/" n "$") { print; exit }'
@@ -64,12 +68,6 @@ compile_component() {
     printf 'BEARSSL_COMPILE_OK=%s\n' "$f"
 }
 
-# Representative files exercise the generic 15-bit integer, SHA-2,
-# P-256, X.509 and TLS engine code paths without linking a target runtime.
-# The lookup is intentionally based on Git-index suffixes so the probe
-# does not depend on whether upstream checks out files at repository root
-# or below a packaging prefix.
-# This is a compile qualification only, not a cryptographic runtime test.
 compile_component int/i15_core.c
 compile_component hash/sha2small.c
 compile_component ec/ec_p256_i15.c
