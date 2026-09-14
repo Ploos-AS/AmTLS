@@ -121,7 +121,9 @@ static int bearssl_init(AmTLS_Backend *backend,
     if (config->server_name == 0 || config->server_name[0] == '\0'
             || config->entropy_fill == 0
             || config->trust_anchors == 0
-            || config->trust_anchor_count == 0) {
+            || config->trust_anchor_count == 0
+            || config->validation_days == 0
+            || config->validation_seconds > 86400u) {
         return -1;
     }
     server_name_len = strlen(config->server_name);
@@ -165,6 +167,9 @@ static int bearssl_init(AmTLS_Backend *backend,
     br_ssl_client_init_full(&state->client, &state->x509,
                             config->trust_anchors,
                             config->trust_anchor_count);
+    br_x509_minimal_set_time(&state->x509,
+                             config->validation_days,
+                             config->validation_seconds);
     br_ssl_engine_set_versions(&state->client.eng, BR_TLS12, BR_TLS12);
     br_ssl_engine_set_buffer(&state->client.eng,
                              state->iobuf, state->iobuf_size, 0);
@@ -274,7 +279,9 @@ int amtls_bearssl_verify_chain(const char *server_name,
                                size_t trust_anchor_count,
                                const unsigned char *const *certs,
                                const size_t *cert_lengths,
-                               size_t cert_count)
+                               size_t cert_count,
+                               uint32_t validation_days,
+                               uint32_t validation_seconds)
 {
     br_x509_minimal_context x509;
     const br_x509_class **xc;
@@ -282,11 +289,13 @@ int amtls_bearssl_verify_chain(const char *server_name,
 
     if (server_name == 0 || server_name[0] == '\0'
             || trust_anchors == 0 || trust_anchor_count == 0
-            || certs == 0 || cert_lengths == 0 || cert_count == 0) {
-        return BR_ERR_X509_BAD_SERVER_NAME;
+            || certs == 0 || cert_lengths == 0 || cert_count == 0
+            || validation_days == 0 || validation_seconds > 86400u) {
+        return BR_ERR_X509_INVALID_VALUE;
     }
 
     br_x509_minimal_init_full(&x509, trust_anchors, trust_anchor_count);
+    br_x509_minimal_set_time(&x509, validation_days, validation_seconds);
     xc = &x509.vtable;
     (*xc)->start_chain(xc, server_name);
     for (i = 0; i < cert_count; i++) {
