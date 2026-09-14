@@ -33,10 +33,11 @@ int amtls_bearssl_client_bind(AmTLS_Backend *backend,
 
 /* Validate a DER certificate chain with the same BearSSL minimal X.509 engine
  * used by the client binding. Certificates are supplied in TLS order: end
- * entity first, then intermediates. Returns BR_ERR_X509_OK (0) on success or
- * the BearSSL X.509 error code on failure. The server name and explicit
- * validation time are mandatory so hostname and validity checks cannot be
- * accidentally bypassed.
+ * entity first, then intermediates. This exposes BearSSL end_chain() return
+ * semantics: 0 means successful validation; failures are returned as non-zero
+ * BearSSL X.509 error codes such as BR_ERR_X509_BAD_SERVER_NAME or
+ * BR_ERR_X509_NOT_TRUSTED. The server name and explicit validation time are
+ * mandatory so hostname and validity checks cannot be accidentally bypassed.
  */
 int amtls_bearssl_verify_chain(const char *server_name,
                                const br_x509_trust_anchor *trust_anchors,
