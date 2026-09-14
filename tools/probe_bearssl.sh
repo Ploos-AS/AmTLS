@@ -28,19 +28,28 @@ printf 'BEARSSL_COMMIT_DATE=%s\n' "$DATE"
 printf 'BEARSSL_SUBJECT=%s\n' "$SUBJECT"
 printf 'BEARSSL_GIT_ARCHIVE_SHA256=%s\n' "$ARCHIVE_SHA256"
 
+compile_one() {
+    f=$1
+    printf 'BEARSSL_COMPILE_SOURCE=%s\n' "$f"
+    if [ ! -f "$f" ]; then
+        printf 'BEARSSL_COMPILE_MISSING=%s\n' "$f" >&2
+        exit 1
+    fi
+    out="../$(basename "$f" .c).o"
+    if ! "$CC" $CFLAGS -Iinc -Isrc -c "$f" -o "$out"; then
+        printf 'BEARSSL_COMPILE_FAILED=%s\n' "$f" >&2
+        exit 1
+    fi
+    printf 'BEARSSL_COMPILE_OK=%s\n' "$f"
+}
+
 # Representative files exercise the generic 15-bit integer, SHA-2,
 # P-256, X.509 and TLS engine code paths without linking a target runtime.
 # This is a compile qualification only, not a cryptographic runtime test.
-for f in \
-    src/int/i15_core.c \
-    src/hash/sha2small.c \
-    src/ec/ec_p256_i15.c \
-    src/x509/x509_minimal.c \
-    src/ssl/ssl_engine.c
- do
-    test -f "$f"
-    out="../$(basename "$f" .c).o"
-    "$CC" $CFLAGS -Iinc -Isrc -c "$f" -o "$out"
- done
+compile_one src/int/i15_core.c
+compile_one src/hash/sha2small.c
+compile_one src/ec/ec_p256_i15.c
+compile_one src/x509/x509_minimal.c
+compile_one src/ssl/ssl_engine.c
 
 printf 'BEARSSL_REPRESENTATIVE_COMPILE=PASS\n'
