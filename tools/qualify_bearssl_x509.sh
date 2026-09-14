@@ -55,7 +55,7 @@ openssl x509 -in "$WORK/other-ca.pem" -outform DER -out "$WORK/other-ca.der"
     src/backends/handshake_pump.c \
     src/backends/bearssl_client.c \
     src/platform/allocator.c \
-    src/backends/bearssl_portable.c \
+    src/backends/bearssl_portable_shim.c \
     tests/test_m2_1_x509.c \
     "$VENDOR_LIB" \
     -o "$OUT"
