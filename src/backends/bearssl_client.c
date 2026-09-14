@@ -269,6 +269,38 @@ int amtls_bearssl_client_bind(AmTLS_Backend *backend,
     return 0;
 }
 
+int amtls_bearssl_verify_chain(const char *server_name,
+                               const br_x509_trust_anchor *trust_anchors,
+                               size_t trust_anchor_count,
+                               const unsigned char *const *certs,
+                               const size_t *cert_lengths,
+                               size_t cert_count)
+{
+    br_x509_minimal_context x509;
+    const br_x509_class **xc;
+    size_t i;
+
+    if (server_name == 0 || server_name[0] == '\0'
+            || trust_anchors == 0 || trust_anchor_count == 0
+            || certs == 0 || cert_lengths == 0 || cert_count == 0) {
+        return BR_ERR_X509_BAD_SERVER_NAME;
+    }
+
+    br_x509_minimal_init_full(&x509, trust_anchors, trust_anchor_count);
+    xc = &x509.vtable;
+    (*xc)->start_chain(xc, server_name);
+    for (i = 0; i < cert_count; i++) {
+        if (certs[i] == 0 || cert_lengths[i] == 0
+                || cert_lengths[i] > 0xFFFFFFFFu) {
+            return BR_ERR_X509_INVALID_VALUE;
+        }
+        (*xc)->start_cert(xc, (uint32_t)cert_lengths[i]);
+        (*xc)->append(xc, certs[i], cert_lengths[i]);
+        (*xc)->end_cert(xc);
+    }
+    return (int)(*xc)->end_chain(xc);
+}
+
 const char *amtls_bearssl_client_server_name(const AmTLS_Backend *backend)
 {
     const AmTLS_BearSSLState *state;
