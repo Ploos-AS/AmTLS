@@ -8,6 +8,7 @@
 mode=client-minimal-v1
 
 include=inc/**
+include=src/*.h
 include=src/settings.c
 include=src/aead/**
 include=src/codec/**
