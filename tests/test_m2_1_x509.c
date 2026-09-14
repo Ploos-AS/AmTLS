@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include <bearssl.h>
 
@@ -84,6 +85,17 @@ static int build_anchor(AnchorHolder *holder,
     return 1;
 }
 
+static void current_bearssl_time(uint32_t *days, uint32_t *seconds)
+{
+    time_t now = time(0);
+    unsigned long long unix_seconds;
+
+    assert(now >= 0);
+    unix_seconds = (unsigned long long)now;
+    *days = (uint32_t)(719528u + unix_seconds / 86400u);
+    *seconds = (uint32_t)(unix_seconds % 86400u);
+}
+
 int main(int argc, char **argv)
 {
     unsigned char *server_der;
@@ -96,6 +108,8 @@ int main(int argc, char **argv)
     size_t chain_len[1];
     AnchorHolder trusted;
     AnchorHolder untrusted;
+    uint32_t validation_days;
+    uint32_t validation_seconds;
     int rc;
 
     assert(argc == 4);
@@ -107,25 +121,32 @@ int main(int argc, char **argv)
     assert(other_ca_der != 0);
     assert(build_anchor(&trusted, ca_der, ca_len));
     assert(build_anchor(&untrusted, other_ca_der, other_ca_len));
+    current_bearssl_time(&validation_days, &validation_seconds);
 
     chain[0] = server_der;
     chain_len[0] = server_len;
 
     rc = amtls_bearssl_verify_chain("valid.example",
                                     &trusted.anchor, 1,
-                                    chain, chain_len, 1);
+                                    chain, chain_len, 1,
+                                    validation_days, validation_seconds);
+    if (rc != BR_ERR_X509_OK) {
+        fprintf(stderr, "trusted-chain rc=%d\n", rc);
+    }
     assert(rc == BR_ERR_X509_OK);
     puts("PASS: trusted chain + matching hostname");
 
     rc = amtls_bearssl_verify_chain("wrong.example",
                                     &trusted.anchor, 1,
-                                    chain, chain_len, 1);
+                                    chain, chain_len, 1,
+                                    validation_days, validation_seconds);
     assert(rc == BR_ERR_X509_BAD_SERVER_NAME);
     puts("PASS: hostname mismatch rejected");
 
     rc = amtls_bearssl_verify_chain("valid.example",
                                     &untrusted.anchor, 1,
-                                    chain, chain_len, 1);
+                                    chain, chain_len, 1,
+                                    validation_days, validation_seconds);
     assert(rc == BR_ERR_X509_NOT_TRUSTED);
     puts("PASS: unknown CA rejected");
 
