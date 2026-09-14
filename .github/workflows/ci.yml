@@ -113,3 +113,12 @@ jobs:
           CFLAGS='-Os -Wall -Wextra -Werror -std=c99 -m68000' \
           RUN_TEST=0 \
           tools/qualify_bearssl_client.sh
+
+  bearssl-x509-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Qualify trusted chain, hostname mismatch and unknown CA
+        run: |
+          chmod +x tools/qualify_bearssl_x509.sh
+          tools/qualify_bearssl_x509.sh
