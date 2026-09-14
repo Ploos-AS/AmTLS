@@ -49,3 +49,13 @@ jobs:
         run: |
           chmod +x tools/qualify_bearssl_host.sh
           tools/qualify_bearssl_host.sh
+
+  bearssl-vendor-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate minimal pinned client vendor tree
+        run: |
+          chmod +x tools/vendor_bearssl.sh
+          tools/vendor_bearssl.sh
+          test -f build/vendor/BearSSL/AMTLS-VENDOR-PROVENANCE.txt
