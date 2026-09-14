@@ -36,12 +36,29 @@
 - [x] host crypto/X.509 qualification of pinned backend
 - [x] 68000 compile qualification of selected backend subset
 - [x] enforce pinned commit and archive SHA-256 in CI
-- [ ] compile generated minimal vendor subset as a standalone library on host and 68000
+- [x] compile and link generated minimal vendor subset as a standalone library on host and 68000
 
 ### M2.1 — Functional TLS client
 
+#### M2.1a — Transport-driven handshake pump
+
+- [x] define backend-independent TLS engine record states
+- [x] pump outbound TLS records through transport callbacks with partial-write handling
+- [x] pump inbound TLS records through transport callbacks with partial-read handling
+- [x] distinguish WANT_READ, WANT_WRITE, CLOSED and ERROR outcomes
+- [x] deterministic host tests for partial I/O, would-block, EOF and engine error
+- [x] include handshake-pump source in 68000 smoke compile
+
+#### M2.1b — BearSSL client binding
+
+- [ ] bind BearSSL engine record buffers to handshake pump
 - [ ] TLS client state machine
 - [ ] SNI/server-name handling
+- [ ] TLS 1.2-only protocol policy
+- [ ] entropy injection contract that fails closed
+
+#### M2.1c — Trust and verification
+
 - [ ] CA trust loading strategy suitable for classic Amiga
 - [ ] certificate-chain validation
 - [ ] hostname verification
