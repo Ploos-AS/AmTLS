@@ -66,9 +66,9 @@
 - [x] wire trust anchors into BearSSL minimal X.509 validator
 - [x] hostname verification contract via required server name
 - [x] negative test: missing trust fails closed before ClientHello
-- [ ] end-to-end certificate-chain validation fixture through AmTLS transport
-- [ ] end-to-end hostname mismatch fixture through AmTLS transport
-- [ ] end-to-end unknown-CA fixture through AmTLS transport
+- [x] end-to-end certificate-chain validation fixture through AmTLS transport
+- [x] end-to-end hostname mismatch fixture through AmTLS transport
+- [x] end-to-end unknown-CA fixture through AmTLS transport
 
 ## M3 — Amiga network integration
 
