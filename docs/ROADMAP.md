@@ -28,11 +28,12 @@
 - [x] add machine-checked backend lock format
 - [x] explicitly reject moving/unreviewed refs for functional TLS integration
 - [x] record why BearSSL v0.6 is not automatically acceptable (upstream fixes continued after release)
-- [ ] resolve and review exact current upstream BearSSL commit
-- [ ] pin immutable 40-hex commit and reviewed archive SHA-256
+- [x] resolve and review exact upstream BearSSL commit used by AmTLS
+- [x] pin immutable 40-hex commit and archive SHA-256
 - [ ] vendor reviewed source subset with original license intact
 - [ ] host crypto/X.509 qualification of pinned backend
-- [ ] 68000 compile qualification of selected backend subset
+- [x] 68000 compile qualification of selected backend subset
+- [x] enforce pinned commit and archive SHA-256 in CI
 
 ### M2.1 — Functional TLS client
 
