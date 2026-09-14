@@ -119,7 +119,9 @@ static int bearssl_init(AmTLS_Backend *backend,
 
     config = (const AmTLS_BearSSLClientConfig *)backend->init_config;
     if (config->server_name == 0 || config->server_name[0] == '\0'
-            || config->entropy_fill == 0) {
+            || config->entropy_fill == 0
+            || config->trust_anchors == 0
+            || config->trust_anchor_count == 0) {
         return -1;
     }
     server_name_len = strlen(config->server_name);
@@ -160,7 +162,9 @@ static int bearssl_init(AmTLS_Backend *backend,
         return -1;
     }
 
-    br_ssl_client_init_full(&state->client, &state->x509, 0, 0);
+    br_ssl_client_init_full(&state->client, &state->x509,
+                            config->trust_anchors,
+                            config->trust_anchor_count);
     br_ssl_engine_set_versions(&state->client.eng, BR_TLS12, BR_TLS12);
     br_ssl_engine_set_buffer(&state->client.eng,
                              state->iobuf, state->iobuf_size, 0);
