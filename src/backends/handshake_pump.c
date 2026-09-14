@@ -5,8 +5,7 @@ static int pump_valid(const AmTLS_HandshakePump *pump)
     return pump != 0
         && pump->engine != 0
         && pump->engine_ops != 0
-        && pump->transport != 0
-        && pump->transport->ops != 0;
+        && pump->transport != 0;
 }
 
 AmTLS_BackendResult amtls_handshake_pump_step(AmTLS_HandshakePump *pump)
@@ -35,7 +34,7 @@ AmTLS_BackendResult amtls_handshake_pump_step(AmTLS_HandshakePump *pump)
     case AMTLS_ENGINE_SEND_RECORD:
         if (pump->engine_ops->send_buffer == 0
                 || pump->engine_ops->send_ack == 0
-                || pump->transport->ops->write == 0) {
+                || pump->transport->write == 0) {
             return AMTLS_BACKEND_ERROR;
         }
         length = 0;
@@ -43,7 +42,7 @@ AmTLS_BackendResult amtls_handshake_pump_step(AmTLS_HandshakePump *pump)
         if (buffer == 0 || length == 0) {
             return AMTLS_BACKEND_ERROR;
         }
-        n = pump->transport->ops->write(pump->transport, buffer, length);
+        n = pump->transport->write(pump->transport->user, buffer, length);
         if (n < 0) {
             return AMTLS_BACKEND_WANT_WRITE;
         }
@@ -56,7 +55,7 @@ AmTLS_BackendResult amtls_handshake_pump_step(AmTLS_HandshakePump *pump)
     case AMTLS_ENGINE_RECV_RECORD:
         if (pump->engine_ops->recv_buffer == 0
                 || pump->engine_ops->recv_ack == 0
-                || pump->transport->ops->read == 0) {
+                || pump->transport->read == 0) {
             return AMTLS_BACKEND_ERROR;
         }
         length = 0;
@@ -64,7 +63,7 @@ AmTLS_BackendResult amtls_handshake_pump_step(AmTLS_HandshakePump *pump)
         if (buffer == 0 || length == 0) {
             return AMTLS_BACKEND_ERROR;
         }
-        n = pump->transport->ops->read(pump->transport, buffer, length);
+        n = pump->transport->read(pump->transport->user, buffer, length);
         if (n < 0) {
             return AMTLS_BACKEND_WANT_READ;
         }
