@@ -29,7 +29,14 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install m68k cross compiler
         run: sudo apt-get update && sudo apt-get install -y gcc-m68k-linux-gnu
-      - name: Probe upstream BearSSL and compile representative 68000 subset
+      - name: Verify pinned BearSSL and compile representative 68000 subset
         run: |
+          . third_party/BearSSL.lock
+          test "$status" = reviewed
           chmod +x tools/probe_bearssl.sh
-          CC=m68k-linux-gnu-gcc CFLAGS='-Os -Wall -Wextra -std=c99 -m68000' tools/probe_bearssl.sh
+          BEARSSL_REPO="$upstream" \
+          BEARSSL_REF="$commit" \
+          BEARSSL_EXPECTED_SHA256="$archive_sha256" \
+          CC=m68k-linux-gnu-gcc \
+          CFLAGS='-Os -Wall -Wextra -std=c99 -m68000' \
+          tools/probe_bearssl.sh
