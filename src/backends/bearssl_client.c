@@ -33,14 +33,17 @@ static AmTLS_EngineState bearssl_engine_state(void *engine)
         return br_ssl_engine_last_error(&client->eng) == BR_ERR_OK
             ? AMTLS_ENGINE_CLOSED : AMTLS_ENGINE_ERROR;
     }
+    /* SENDAPP/RECVAPP means the TLS handshake has completed. BearSSL may
+     * expose record I/O readiness at the same time, so application readiness
+     * must take precedence when handshake() decides whether it is done. */
+    if ((state & (BR_SSL_SENDAPP | BR_SSL_RECVAPP)) != 0) {
+        return AMTLS_ENGINE_APPLICATION;
+    }
     if ((state & BR_SSL_SENDREC) != 0) {
         return AMTLS_ENGINE_SEND_RECORD;
     }
     if ((state & BR_SSL_RECVREC) != 0) {
         return AMTLS_ENGINE_RECV_RECORD;
-    }
-    if ((state & (BR_SSL_SENDAPP | BR_SSL_RECVAPP)) != 0) {
-        return AMTLS_ENGINE_APPLICATION;
     }
     return AMTLS_ENGINE_ERROR;
 }
