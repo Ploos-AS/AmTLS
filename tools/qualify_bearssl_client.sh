@@ -18,6 +18,7 @@ CC="$CC" AR="$AR" CFLAGS="$CFLAGS" VENDOR="$VENDOR" \
     -Iinclude -Isrc -I"$VENDOR/inc" \
     src/platform/allocator.c \
     src/backends/handshake_pump.c \
+    src/backends/bearssl_portable_shim.c \
     src/backends/bearssl_client.c \
     tests/test_m2_1_bearssl.c \
     "$VENDOR_LIB" \
