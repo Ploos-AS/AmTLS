@@ -59,3 +59,33 @@ jobs:
           chmod +x tools/vendor_bearssl.sh
           tools/vendor_bearssl.sh
           test -f build/vendor/BearSSL/AMTLS-VENDOR-PROVENANCE.txt
+
+  bearssl-vendor-host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate vendor tree
+        run: |
+          chmod +x tools/vendor_bearssl.sh tools/build_vendor_bearssl.sh
+          tools/vendor_bearssl.sh
+      - name: Build and link minimal vendor library on host
+        run: tools/build_vendor_bearssl.sh
+      - name: Run host link smoke
+        run: build/vendor-lib/link-smoke
+
+  bearssl-vendor-m68k:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install m68k cross compiler
+        run: sudo apt-get update && sudo apt-get install -y gcc-m68k-linux-gnu
+      - name: Generate vendor tree
+        run: |
+          chmod +x tools/vendor_bearssl.sh tools/build_vendor_bearssl.sh
+          tools/vendor_bearssl.sh
+      - name: Build and link full minimal vendor library for 68000
+        run: |
+          CC=m68k-linux-gnu-gcc \
+          AR=m68k-linux-gnu-ar \
+          CFLAGS='-Os -Wall -Wextra -std=c99 -m68000' \
+          tools/build_vendor_bearssl.sh
