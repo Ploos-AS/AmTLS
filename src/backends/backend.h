@@ -29,6 +29,7 @@ typedef struct AmTLS_BackendOps {
 typedef struct AmTLS_Backend {
     const AmTLS_BackendOps *ops;
     void *state;
+    const void *init_config;
 } AmTLS_Backend;
 
 #endif
