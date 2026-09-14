@@ -131,7 +131,7 @@ int main(int argc, char **argv)
                                     chain, chain_len, 1,
                                     validation_days, validation_seconds);
     fprintf(stderr, "trusted-chain rc=%d\n", rc);
-    assert(rc == BR_ERR_X509_OK);
+    assert(rc == 0);
     puts("PASS: trusted chain + matching hostname");
 
     rc = amtls_bearssl_verify_chain("wrong.example",
@@ -140,7 +140,7 @@ int main(int argc, char **argv)
                                     validation_days, validation_seconds);
     fprintf(stderr, "hostname-mismatch rc=%d expected=%d\n",
             rc, BR_ERR_X509_BAD_SERVER_NAME);
-    assert(rc != BR_ERR_X509_OK);
+    assert(rc == BR_ERR_X509_BAD_SERVER_NAME);
     puts("PASS: hostname mismatch rejected");
 
     rc = amtls_bearssl_verify_chain("valid.example",
@@ -149,7 +149,7 @@ int main(int argc, char **argv)
                                     validation_days, validation_seconds);
     fprintf(stderr, "unknown-ca rc=%d expected=%d\n",
             rc, BR_ERR_X509_NOT_TRUSTED);
-    assert(rc != BR_ERR_X509_OK);
+    assert(rc == BR_ERR_X509_NOT_TRUSTED);
     puts("PASS: unknown CA rejected");
 
     free(server_der);
