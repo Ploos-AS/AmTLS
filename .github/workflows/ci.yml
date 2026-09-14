@@ -122,3 +122,12 @@ jobs:
         run: |
           chmod +x tools/qualify_bearssl_x509.sh
           tools/qualify_bearssl_x509.sh
+
+  bearssl-transport-security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Qualify TLS verification through AmTLS transport
+        run: |
+          chmod +x tools/qualify_bearssl_transport.sh
+          tools/qualify_bearssl_transport.sh
