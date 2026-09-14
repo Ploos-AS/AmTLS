@@ -51,18 +51,24 @@
 
 #### M2.1b — BearSSL client binding
 
-- [ ] bind BearSSL engine record buffers to handshake pump
-- [ ] TLS client state machine
-- [ ] SNI/server-name handling
-- [ ] TLS 1.2-only protocol policy
-- [ ] entropy injection contract that fails closed
+- [x] bind BearSSL engine record buffers to handshake pump
+- [x] TLS client state machine
+- [x] SNI/server-name handling
+- [x] TLS 1.2-only protocol policy
+- [x] entropy injection contract that fails closed
+- [x] host ClientHello/SNI qualification
+- [x] 68000 compile/link qualification
 
 #### M2.1c — Trust and verification
 
-- [ ] CA trust loading strategy suitable for classic Amiga
-- [ ] certificate-chain validation
-- [ ] hostname verification
-- [ ] negative/security tests
+- [x] define CA trust loading strategy suitable for classic Amiga
+- [x] require explicit non-empty trust-anchor set before handshake
+- [x] wire trust anchors into BearSSL minimal X.509 validator
+- [x] hostname verification contract via required server name
+- [x] negative test: missing trust fails closed before ClientHello
+- [ ] end-to-end certificate-chain validation fixture through AmTLS transport
+- [ ] end-to-end hostname mismatch fixture through AmTLS transport
+- [ ] end-to-end unknown-CA fixture through AmTLS transport
 
 ## M3 — Amiga network integration
 
