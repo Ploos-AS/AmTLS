@@ -40,3 +40,12 @@ jobs:
           CC=m68k-linux-gnu-gcc \
           CFLAGS='-Os -Wall -Wextra -std=c99 -m68000' \
           tools/probe_bearssl.sh
+
+  bearssl-host-qualification:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build pinned BearSSL and run crypto/X.509 tests
+        run: |
+          chmod +x tools/qualify_bearssl_host.sh
+          tools/qualify_bearssl_host.sh
