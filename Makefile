@@ -4,6 +4,7 @@ CPPFLAGS ?= -Iinclude -Isrc
 
 BUILD := build
 LIBOBJ := $(BUILD)/amtls.o $(BUILD)/allocator.o
+PUMPOBJ := $(BUILD)/handshake_pump.o
 
 .PHONY: all check smoke-68000 verify-backend-lock clean
 
@@ -18,6 +19,9 @@ $(BUILD)/amtls.o: src/amtls.c include/amtls/amtls.h | $(BUILD)
 $(BUILD)/allocator.o: src/platform/allocator.c src/platform/allocator.h | $(BUILD)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c src/platform/allocator.c -o $@
 
+$(BUILD)/handshake_pump.o: src/backends/handshake_pump.c src/backends/handshake_pump.h src/backends/backend.h src/platform/transport.h | $(BUILD)
+	$(CC) $(CPPFLAGS) $(CFLAGS) -c src/backends/handshake_pump.c -o $@
+
 $(BUILD)/TLSInfo: cli/tlsinfo.c $(LIBOBJ) | $(BUILD)
 	$(CC) $(CPPFLAGS) $(CFLAGS) cli/tlsinfo.c $(LIBOBJ) -o $@
 
@@ -27,9 +31,13 @@ $(BUILD)/test_api: tests/test_api.c $(LIBOBJ) | $(BUILD)
 $(BUILD)/test_m1: tests/test_m1.c $(LIBOBJ) | $(BUILD)
 	$(CC) $(CPPFLAGS) $(CFLAGS) tests/test_m1.c $(LIBOBJ) -o $@
 
-check: verify-backend-lock $(BUILD)/test_api $(BUILD)/test_m1 $(BUILD)/TLSInfo
+$(BUILD)/test_m2_1_pump: tests/test_m2_1_pump.c $(PUMPOBJ) | $(BUILD)
+	$(CC) $(CPPFLAGS) $(CFLAGS) tests/test_m2_1_pump.c $(PUMPOBJ) -o $@
+
+check: verify-backend-lock $(BUILD)/test_api $(BUILD)/test_m1 $(BUILD)/test_m2_1_pump $(BUILD)/TLSInfo
 	./$(BUILD)/test_api
 	./$(BUILD)/test_m1
+	./$(BUILD)/test_m2_1_pump
 	./$(BUILD)/TLSInfo
 
 verify-backend-lock:
@@ -38,6 +46,7 @@ verify-backend-lock:
 smoke-68000: | $(BUILD)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -m68000 -c src/amtls.c -o $(BUILD)/amtls-68000.o
 	$(CC) $(CPPFLAGS) $(CFLAGS) -m68000 -c src/platform/allocator.c -o $(BUILD)/allocator-68000.o
+	$(CC) $(CPPFLAGS) $(CFLAGS) -m68000 -c src/backends/handshake_pump.c -o $(BUILD)/handshake_pump-68000.o
 	$(CC) $(CPPFLAGS) $(CFLAGS) -m68000 -c cli/tlsinfo.c -o $(BUILD)/tlsinfo-68000.o
 
 clean:
