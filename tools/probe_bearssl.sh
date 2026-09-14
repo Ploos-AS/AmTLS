@@ -28,15 +28,36 @@ printf 'BEARSSL_COMMIT_DATE=%s\n' "$DATE"
 printf 'BEARSSL_SUBJECT=%s\n' "$SUBJECT"
 printf 'BEARSSL_GIT_ARCHIVE_SHA256=%s\n' "$ARCHIVE_SHA256"
 
-compile_one() {
-    f=$1
-    printf 'BEARSSL_COMPILE_SOURCE=%s\n' "$f"
-    if [ ! -f "$f" ]; then
-        printf 'BEARSSL_COMPILE_MISSING=%s\n' "$f" >&2
+find_source() {
+    name=$1
+    git ls-files | awk -v n="$name" '$0 == n || $0 ~ ("/" n "$") { print; exit }'
+}
+
+compile_component() {
+    logical=$1
+    f=$(find_source "$logical")
+    if [ -z "$f" ]; then
+        printf 'BEARSSL_COMPILE_MISSING=%s\n' "$logical" >&2
         exit 1
     fi
+
+    case "$f" in
+        src/*)
+            root=.
+            ;;
+        */src/*)
+            root=${f%%/src/*}
+            ;;
+        *)
+            printf 'BEARSSL_COMPILE_UNEXPECTED_LAYOUT=%s\n' "$f" >&2
+            exit 1
+            ;;
+    esac
+
+    printf 'BEARSSL_COMPILE_SOURCE=%s\n' "$f"
+    printf 'BEARSSL_SOURCE_ROOT=%s\n' "$root"
     out="../$(basename "$f" .c).o"
-    if ! "$CC" $CFLAGS -Iinc -Isrc -c "$f" -o "$out"; then
+    if ! "$CC" $CFLAGS -I"$root/inc" -I"$root/src" -c "$f" -o "$out"; then
         printf 'BEARSSL_COMPILE_FAILED=%s\n' "$f" >&2
         exit 1
     fi
@@ -45,11 +66,14 @@ compile_one() {
 
 # Representative files exercise the generic 15-bit integer, SHA-2,
 # P-256, X.509 and TLS engine code paths without linking a target runtime.
+# The lookup is intentionally based on Git-index suffixes so the probe
+# does not depend on whether upstream checks out files at repository root
+# or below a packaging prefix.
 # This is a compile qualification only, not a cryptographic runtime test.
-compile_one src/int/i15_core.c
-compile_one src/hash/sha2small.c
-compile_one src/ec/ec_p256_i15.c
-compile_one src/x509/x509_minimal.c
-compile_one src/ssl/ssl_engine.c
+compile_component int/i15_core.c
+compile_component hash/sha2small.c
+compile_component ec/ec_p256_i15.c
+compile_component x509/x509_minimal.c
+compile_component ssl/ssl_engine.c
 
 printf 'BEARSSL_REPRESENTATIVE_COMPILE=PASS\n'
