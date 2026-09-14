@@ -1,0 +1,51 @@
+# BearSSL vendoring policy for AmTLS
+#
+# Applied only to the immutable source identified by BearSSL.lock.
+# The goal is a classic-Amiga TLS client subset, not a general BearSSL SDK.
+# Rules are evaluated in order by tools/vendor_bearssl.sh: include first,
+# then exclusions win.
+
+mode=client-minimal-v1
+
+include=inc/**
+include=src/settings.c
+include=src/aead/**
+include=src/codec/**
+include=src/ec/**
+include=src/hash/**
+include=src/int/**
+include=src/kdf/**
+include=src/mac/**
+include=src/rand/**
+include=src/rsa/**
+include=src/ssl/**
+include=src/symcipher/**
+include=src/x509/**
+
+# AmTLS v0.1 is client-only.
+exclude=src/ssl/ssl_server*
+exclude=src/ssl/ssl_hs_server.c
+exclude=src/ssl/ssl_scert_*
+
+# No private-key generation/signing stack is needed by the TLS client.
+exclude=src/rsa/*keygen*
+exclude=src/rsa/*priv*
+exclude=src/rsa/*oaep*
+exclude=src/rsa/*pss_sign*
+exclude=src/rsa/*pkcs1_sign*
+exclude=src/ec/ec_keygen.c
+exclude=src/ec/ecdsa_*sign*
+
+# Host/CPU-specific acceleration is not part of the 68000 baseline.
+exclude=src/symcipher/*x86ni*
+exclude=src/symcipher/*pwr8*
+exclude=src/symcipher/*sse2*
+exclude=src/hash/*pclmul*
+exclude=src/hash/*pwr8*
+
+# BearSSL developer tools/tests are qualification inputs, not runtime payload.
+exclude=tools/**
+exclude=test/**
+
+# The vendoring script separately copies the upstream license file and records
+# the exact commit/archive digest used to generate the tree.
