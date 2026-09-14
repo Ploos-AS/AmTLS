@@ -11,6 +11,10 @@ typedef struct CaptureTransport {
     size_t output_len;
 } CaptureTransport;
 
+/* 2026-09-14 in BearSSL's day epoch (1970-01-01 = 719528). */
+#define TEST_VALIDATION_DAYS 740238u
+#define TEST_VALIDATION_SECONDS 43200u
+
 /* Structurally present anchor for pre-certificate ClientHello tests. The
  * X.509 path is qualified separately; this fixture is never used to validate
  * a peer certificate. */
@@ -101,6 +105,12 @@ static void setup_transport(AmTLS_Transport *transport,
     transport->close = capture_close;
 }
 
+static void set_test_time(AmTLS_BearSSLClientConfig *config)
+{
+    config->validation_days = TEST_VALIDATION_DAYS;
+    config->validation_seconds = TEST_VALIDATION_SECONDS;
+}
+
 static void test_entropy_is_mandatory(void)
 {
     AmTLS_Backend backend;
@@ -117,6 +127,7 @@ static void test_entropy_is_mandatory(void)
     config.server_name = "example.com";
     config.trust_anchors = &test_anchor;
     config.trust_anchor_count = 1;
+    set_test_time(&config);
     assert(amtls_bearssl_client_bind(&backend, &config) == 0);
     assert(backend.ops->init(&backend, &transport, &allocator) != 0);
     assert(backend.state == 0);
@@ -141,6 +152,33 @@ static void test_trust_anchor_is_mandatory(void)
     config.server_name = "example.com";
     config.entropy_fill = deterministic_entropy;
     config.entropy_user = &seed;
+    set_test_time(&config);
+    assert(amtls_bearssl_client_bind(&backend, &config) == 0);
+    assert(backend.ops->init(&backend, &transport, &allocator) != 0);
+    assert(backend.state == 0);
+    assert(allocator.stats.current_bytes == 0);
+    assert(capture.output_len == 0);
+}
+
+static void test_validation_time_is_mandatory(void)
+{
+    unsigned char seed = 0x23;
+    AmTLS_Backend backend;
+    AmTLS_BearSSLClientConfig config;
+    AmTLS_Allocator allocator;
+    AmTLS_Transport transport;
+    CaptureTransport capture;
+
+    memset(&backend, 0, sizeof(backend));
+    memset(&config, 0, sizeof(config));
+    setup_allocator(&allocator);
+    setup_transport(&transport, &capture);
+
+    config.server_name = "example.com";
+    config.entropy_fill = deterministic_entropy;
+    config.entropy_user = &seed;
+    config.trust_anchors = &test_anchor;
+    config.trust_anchor_count = 1;
     assert(amtls_bearssl_client_bind(&backend, &config) == 0);
     assert(backend.ops->init(&backend, &transport, &allocator) != 0);
     assert(backend.state == 0);
@@ -169,6 +207,7 @@ static void test_tls12_clienthello_with_sni(void)
     config.entropy_user = &seed;
     config.trust_anchors = &test_anchor;
     config.trust_anchor_count = 1;
+    set_test_time(&config);
 
     assert(amtls_bearssl_client_bind(&backend, &config) == 0);
     assert(backend.ops != 0);
@@ -198,6 +237,7 @@ int main(void)
 {
     test_entropy_is_mandatory();
     test_trust_anchor_is_mandatory();
+    test_validation_time_is_mandatory();
     test_tls12_clienthello_with_sni();
     return 0;
 }
