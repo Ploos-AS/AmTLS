@@ -30,10 +30,13 @@
 - [x] record why BearSSL v0.6 is not automatically acceptable (upstream fixes continued after release)
 - [x] resolve and review exact upstream BearSSL commit used by AmTLS
 - [x] pin immutable 40-hex commit and archive SHA-256
-- [ ] vendor reviewed source subset with original license intact
-- [ ] host crypto/X.509 qualification of pinned backend
+- [x] define minimal client-only vendor policy
+- [x] add reproducible vendor-tree generator with provenance and upstream license preservation
+- [ ] commit reviewed source subset under third_party/vendor/BearSSL
+- [x] host crypto/X.509 qualification of pinned backend
 - [x] 68000 compile qualification of selected backend subset
 - [x] enforce pinned commit and archive SHA-256 in CI
+- [ ] compile generated minimal vendor subset as a standalone library on host and 68000
 
 ### M2.1 — Functional TLS client
 
