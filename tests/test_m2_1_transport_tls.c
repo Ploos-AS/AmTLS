@@ -2,6 +2,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <netinet/in.h>
+#include <poll.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -138,7 +139,7 @@ static long socket_read(void *user, void *buffer, size_t length)
     SocketTransport *st = (SocketTransport *)user;
     ssize_t n = recv(st->fd, buffer, length, 0);
 
-    if (n < 0 && errno == EINTR) {
+    if (n < 0 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)) {
         return -1;
     }
     return (long)n;
@@ -149,7 +150,7 @@ static long socket_write(void *user, const void *buffer, size_t length)
     SocketTransport *st = (SocketTransport *)user;
     ssize_t n = send(st->fd, buffer, length, 0);
 
-    if (n < 0 && errno == EINTR) {
+    if (n < 0 && (errno == EINTR || errno == EAGAIN || errno == EWOULDBLOCK)) {
         return -1;
     }
     return (long)n;
@@ -171,6 +172,7 @@ static int connect_loopback(unsigned short port)
 {
     struct sockaddr_in sa;
     int fd;
+    int flags;
 
     fd = socket(AF_INET, SOCK_STREAM, 0);
     if (fd < 0) {
@@ -184,7 +186,27 @@ static int connect_loopback(unsigned short port)
         close(fd);
         return -1;
     }
+    flags = fcntl(fd, F_GETFL, 0);
+    if (flags < 0 || fcntl(fd, F_SETFL, flags | O_NONBLOCK) != 0) {
+        close(fd);
+        return -1;
+    }
     return fd;
+}
+
+static void wait_for_socket(int fd, AmTLS_BackendResult result)
+{
+    struct pollfd pfd;
+    short events;
+    int rc;
+
+    events = result == AMTLS_BACKEND_WANT_WRITE ? POLLOUT : POLLIN;
+    memset(&pfd, 0, sizeof(pfd));
+    pfd.fd = fd;
+    pfd.events = events;
+    do {
+        rc = poll(&pfd, 1, 50);
+    } while (rc < 0 && errno == EINTR);
 }
 
 static void current_bearssl_time(uint32_t *days, uint32_t *seconds)
@@ -261,6 +283,7 @@ int main(int argc, char **argv)
                 || result == AMTLS_BACKEND_CLOSED) {
             break;
         }
+        wait_for_socket(socket_state.fd, result);
     }
     assert(steps < 10000u);
     last_error = amtls_bearssl_client_last_error(&backend);
