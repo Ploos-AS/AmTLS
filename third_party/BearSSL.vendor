@@ -28,6 +28,11 @@ exclude=src/ssl/ssl_server*
 exclude=src/ssl/ssl_hs_server.c
 exclude=src/ssl/ssl_scert_*
 
+# Entropy is supplied explicitly by AmTLS. Do not vendor BearSSL's host-specific
+# system RNG shim; this keeps the client deterministic across host/Amiga builds
+# and preserves fail-closed behavior when no approved entropy provider exists.
+exclude=src/rand/sysrng.c
+
 # No private-key generation/signing stack is needed by the TLS client.
 exclude=src/rsa/*keygen*
 exclude=src/rsa/*priv*
