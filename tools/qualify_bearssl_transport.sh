@@ -73,11 +73,15 @@ s.close()
 PY
 )
     log="$WORK/${name}-server.log"
+    # -www keeps the accepted TLS connection alive after the handshake and
+    # waits for application data. Without it, s_server may observe EOF on its
+    # inherited stdin in CI and close immediately after a successful handshake,
+    # racing the AmTLS pump before it can observe BR_SSL_SENDAPP/RECVAPP.
     openssl s_server \
         -accept "127.0.0.1:$port" \
         -cert "$WORK/server.pem" \
         -key "$WORK/server.key" \
-        -tls1_2 -quiet >"$log" 2>&1 &
+        -tls1_2 -quiet -www >"$log" 2>&1 &
     server_pid=$!
     trap 'kill "$server_pid" 2>/dev/null || true' EXIT HUP INT TERM
     sleep 1
