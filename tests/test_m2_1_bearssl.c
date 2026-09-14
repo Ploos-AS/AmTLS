@@ -218,7 +218,10 @@ static void test_tls12_clienthello_with_sni(void)
                   (const char *)host) == 0);
 
     result = backend.ops->handshake(&backend);
-    assert(result == AMTLS_BACKEND_WANT_WRITE);
+    /* The pump sends the complete ClientHello in this step. Once sendrec_ack()
+     * advances BearSSL, the engine is waiting for the ServerHello, so the
+     * post-ACK result is WANT_READ rather than the old pre-ACK WANT_WRITE. */
+    assert(result == AMTLS_BACKEND_WANT_READ);
     assert(capture.output_len > 11);
 
     assert(capture.output[0] == 0x16);
