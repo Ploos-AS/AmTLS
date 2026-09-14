@@ -11,6 +11,11 @@ typedef struct CaptureTransport {
     size_t output_len;
 } CaptureTransport;
 
+/* Structurally present anchor for pre-certificate ClientHello tests. The
+ * X.509 path is qualified separately; this fixture is never used to validate
+ * a peer certificate. */
+static const br_x509_trust_anchor test_anchor = { 0 };
+
 static long capture_read(void *user, void *buffer, size_t length)
 {
     (void)user;
@@ -110,6 +115,32 @@ static void test_entropy_is_mandatory(void)
     setup_transport(&transport, &capture);
 
     config.server_name = "example.com";
+    config.trust_anchors = &test_anchor;
+    config.trust_anchor_count = 1;
+    assert(amtls_bearssl_client_bind(&backend, &config) == 0);
+    assert(backend.ops->init(&backend, &transport, &allocator) != 0);
+    assert(backend.state == 0);
+    assert(allocator.stats.current_bytes == 0);
+    assert(capture.output_len == 0);
+}
+
+static void test_trust_anchor_is_mandatory(void)
+{
+    unsigned char seed = 0x22;
+    AmTLS_Backend backend;
+    AmTLS_BearSSLClientConfig config;
+    AmTLS_Allocator allocator;
+    AmTLS_Transport transport;
+    CaptureTransport capture;
+
+    memset(&backend, 0, sizeof(backend));
+    memset(&config, 0, sizeof(config));
+    setup_allocator(&allocator);
+    setup_transport(&transport, &capture);
+
+    config.server_name = "example.com";
+    config.entropy_fill = deterministic_entropy;
+    config.entropy_user = &seed;
     assert(amtls_bearssl_client_bind(&backend, &config) == 0);
     assert(backend.ops->init(&backend, &transport, &allocator) != 0);
     assert(backend.state == 0);
@@ -136,6 +167,8 @@ static void test_tls12_clienthello_with_sni(void)
     config.server_name = (const char *)host;
     config.entropy_fill = deterministic_entropy;
     config.entropy_user = &seed;
+    config.trust_anchors = &test_anchor;
+    config.trust_anchor_count = 1;
 
     assert(amtls_bearssl_client_bind(&backend, &config) == 0);
     assert(backend.ops != 0);
@@ -149,15 +182,10 @@ static void test_tls12_clienthello_with_sni(void)
     assert(result == AMTLS_BACKEND_WANT_WRITE);
     assert(capture.output_len > 11);
 
-    /* TLS record type Handshake, then ClientHello handshake type. */
     assert(capture.output[0] == 0x16);
     assert(capture.output[5] == 0x01);
-
-    /* ClientHello legacy_version is TLS 1.2 (0x0303). */
     assert(capture.output[9] == 0x03);
     assert(capture.output[10] == 0x03);
-
-    /* br_ssl_client_reset(server_name) must emit SNI in ClientHello. */
     assert(contains_bytes(capture.output, capture.output_len,
                           host, sizeof(host) - 1));
 
@@ -169,6 +197,7 @@ static void test_tls12_clienthello_with_sni(void)
 int main(void)
 {
     test_entropy_is_mandatory();
+    test_trust_anchor_is_mandatory();
     test_tls12_clienthello_with_sni();
     return 0;
 }
