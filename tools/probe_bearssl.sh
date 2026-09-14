@@ -28,10 +28,6 @@ printf 'BEARSSL_COMMIT_DATE=%s\n' "$DATE"
 printf 'BEARSSL_SUBJECT=%s\n' "$SUBJECT"
 printf 'BEARSSL_GIT_ARCHIVE_SHA256=%s\n' "$ARCHIVE_SHA256"
 
-printf '%s\n' 'BEARSSL_SOURCE_INVENTORY_BEGIN'
-git ls-files | grep -E '(^|/)([^/]*(i15|sha2|p256|x509|ssl)[^/]*)\.c$' | head -100 || true
-printf '%s\n' 'BEARSSL_SOURCE_INVENTORY_END'
-
 find_source() {
     name=$1
     git ls-files | awk -v n="$name" '$0 == n || $0 ~ ("/" n "$") { print; exit }'
@@ -59,7 +55,6 @@ compile_component() {
     esac
 
     printf 'BEARSSL_COMPILE_SOURCE=%s\n' "$f"
-    printf 'BEARSSL_SOURCE_ROOT=%s\n' "$root"
     out="../$(basename "$f" .c).o"
     if ! "$CC" $CFLAGS -I"$root/inc" -I"$root/src" -c "$f" -o "$out"; then
         printf 'BEARSSL_COMPILE_FAILED=%s\n' "$f" >&2
@@ -68,9 +63,14 @@ compile_component() {
     printf 'BEARSSL_COMPILE_OK=%s\n' "$f"
 }
 
-compile_component int/i15_core.c
+# Representative compile qualification for the 2026 BearSSL tree.
+# The old monolithic i15_core.c was split upstream, and the dedicated
+# P-256/i15 implementation is now named ec_p256_m15.c.
+compile_component int/i15_add.c
+compile_component int/i15_montmul.c
+compile_component int/i15_modpow.c
 compile_component hash/sha2small.c
-compile_component ec/ec_p256_i15.c
+compile_component ec/ec_p256_m15.c
 compile_component x509/x509_minimal.c
 compile_component ssl/ssl_engine.c
 
