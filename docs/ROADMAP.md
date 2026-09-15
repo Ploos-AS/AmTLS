@@ -77,10 +77,18 @@
 - [x] define adapter state and generic transport binding
 - [x] implement recv/send/close callbacks without exposing socket details to TLS core
 - [x] host socket-pair qualification for bidirectional I/O and owned-socket close
-- [ ] AmigaOS/68000 compile qualification of adapter
+- [x] 68000 cross-compile qualification of adapter
+- [x] record qualification evidence in `docs/M3_1_QUALIFICATION.md`
 
-- [ ] AmigaOS build
-- [ ] `amtls.library` lifecycle/API implementation
+### M3.2 — Native AmigaOS build and library lifecycle
+
+- [ ] define native AmigaOS build contract/toolchain target
+- [ ] implement `amtls.library` lifecycle/API skeleton
+- [ ] compile native AmigaOS/68000 library objects
+- [ ] add automated qualification where feasible
+
+### M3.3 — Runtime qualification
+
 - [ ] FS-UAE/AROS initial runtime qualification where feasible
 - [ ] local AmigaOS 2.04+ qualification
 
