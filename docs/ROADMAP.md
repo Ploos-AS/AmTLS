@@ -72,7 +72,13 @@
 
 ## M3 — Amiga network integration
 
-- [ ] bsdsocket-compatible transport adapter
+### M3.1 — bsdsocket-compatible transport adapter
+
+- [x] define adapter state and generic transport binding
+- [x] implement recv/send/close callbacks without exposing socket details to TLS core
+- [x] host socket-pair qualification for bidirectional I/O and owned-socket close
+- [ ] AmigaOS/68000 compile qualification of adapter
+
 - [ ] AmigaOS build
 - [ ] `amtls.library` lifecycle/API implementation
 - [ ] FS-UAE/AROS initial runtime qualification where feasible
