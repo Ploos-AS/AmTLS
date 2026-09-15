@@ -55,6 +55,7 @@ smoke-68000: | $(BUILD)
 	$(CC) $(CPPFLAGS) $(CFLAGS) -m68000 -c src/amtls.c -o $(BUILD)/amtls-68000.o
 	$(CC) $(CPPFLAGS) $(CFLAGS) -m68000 -c src/platform/allocator.c -o $(BUILD)/allocator-68000.o
 	$(CC) $(CPPFLAGS) $(CFLAGS) -m68000 -c src/backends/handshake_pump.c -o $(BUILD)/handshake_pump-68000.o
+	$(CC) $(CPPFLAGS) $(CFLAGS) -m68000 -c src/platform/bsdsocket_transport.c -o $(BUILD)/bsdsocket_transport-68000.o
 	$(CC) $(CPPFLAGS) $(CFLAGS) -m68000 -c cli/tlsinfo.c -o $(BUILD)/tlsinfo-68000.o
 
 clean:
