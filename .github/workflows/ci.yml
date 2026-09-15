@@ -23,6 +23,34 @@ jobs:
       - name: Compile 68000 objects
         run: make CC=m68k-linux-gnu-gcc smoke-68000
 
+  amigaos-native:
+    runs-on: ubuntu-latest
+    container: amigadev/m68k-amigaos:latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Show AmigaOS toolchain
+        run: |
+          m68k-amigaos-gcc --version
+          test -f /opt/m68k-amigaos/m68k-amigaos/ndk-include/proto/bsdsocket.h || \
+            test -f /opt/m68k-amigaos/m68k-amigaos/sys-include/proto/bsdsocket.h
+      - name: Compile native AmigaOS 68000 objects
+        run: |
+          mkdir -p build/amigaos
+          CFLAGS='-Os -Wall -Wextra -Werror -std=c99 -m68000 -msoft-float'
+          CPPFLAGS='-Iinclude -Isrc'
+          m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/amtls.c -o build/amigaos/amtls.o
+          m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/platform/allocator.c -o build/amigaos/allocator.o
+          m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/backends/handshake_pump.c -o build/amigaos/handshake_pump.o
+          m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/platform/bsdsocket_transport.c -o build/amigaos/bsdsocket_transport.o
+          m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/amiga/library_lifecycle.c -o build/amigaos/library_lifecycle.o
+          m68k-amigaos-gcc $CPPFLAGS $CFLAGS -mcrt=nix20 cli/tlsinfo.c build/amigaos/amtls.o build/amigaos/allocator.o -o build/amigaos/TLSInfo
+          file build/amigaos/TLSInfo
+      - name: Upload native AmigaOS smoke artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: amtls-amigaos-native-smoke
+          path: build/amigaos/TLSInfo
+
   bearssl-probe:
     runs-on: ubuntu-latest
     steps:
