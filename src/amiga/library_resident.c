@@ -1,6 +1,7 @@
 #include <exec/libraries.h>
 #include <exec/resident.h>
 #include <exec/types.h>
+#include <dos/dos.h>
 #include <proto/exec.h>
 
 #define STR_(x) #x
@@ -27,18 +28,18 @@ int __attribute__((no_reorder)) _start(void)
 
 extern const ULONG amtls_auto_init[4];
 
-asm("amtls_romtag:                         \n"
-    "       dc.w    " STR(RTC_MATCHWORD) " \n"
-    "       dc.l    amtls_romtag           \n"
-    "       dc.l    amtls_endcode          \n"
-    "       dc.b    " STR(RTF_AUTOINIT) "  \n"
-    "       dc.b    " STR(AMTLS_VERSION) " \n"
-    "       dc.b    " STR(NT_LIBRARY) "    \n"
-    "       dc.b    " STR(AMTLS_PRIORITY) "\n"
-    "       dc.l    library_name           \n"
-    "       dc.l    library_id             \n"
-    "       dc.l    amtls_auto_init        \n"
-    "amtls_endcode:                        \n");
+__asm__("amtls_romtag:                         \n"
+        "       dc.w    " STR(RTC_MATCHWORD) " \n"
+        "       dc.l    amtls_romtag           \n"
+        "       dc.l    amtls_endcode          \n"
+        "       dc.b    " STR(RTF_AUTOINIT) "  \n"
+        "       dc.b    " STR(AMTLS_VERSION) " \n"
+        "       dc.b    " STR(NT_LIBRARY) "    \n"
+        "       dc.b    " STR(AMTLS_PRIORITY) "\n"
+        "       dc.l    library_name           \n"
+        "       dc.l    library_id             \n"
+        "       dc.l    amtls_auto_init        \n"
+        "amtls_endcode:                        \n");
 
 static BPTR amtls_do_expunge(struct AmTLSLibraryBase *base)
 {
@@ -57,9 +58,9 @@ static BPTR amtls_do_expunge(struct AmTLSLibraryBase *base)
 }
 
 static struct AmTLSLibraryBase * __attribute__((used))
-amtls_init(struct ExecBase *sys_base asm("a6"),
-           BPTR seg_list asm("a0"),
-           struct AmTLSLibraryBase *base asm("d0"))
+amtls_init(struct ExecBase *sys_base __asm__("a6"),
+           BPTR seg_list __asm__("a0"),
+           struct AmTLSLibraryBase *base __asm__("d0"))
 {
     base->seg_list = seg_list;
     base->sys_base = sys_base;
@@ -73,7 +74,7 @@ amtls_init(struct ExecBase *sys_base asm("a6"),
 }
 
 static struct AmTLSLibraryBase * __attribute__((used))
-amtls_open(struct AmTLSLibraryBase *base asm("a6"))
+amtls_open(struct AmTLSLibraryBase *base __asm__("a6"))
 {
     base->library.lib_OpenCnt++;
     base->library.lib_Flags &= (UBYTE)~LIBF_DELEXP;
@@ -81,7 +82,7 @@ amtls_open(struct AmTLSLibraryBase *base asm("a6"))
 }
 
 static BPTR __attribute__((used))
-amtls_close(struct AmTLSLibraryBase *base asm("a6"))
+amtls_close(struct AmTLSLibraryBase *base __asm__("a6"))
 {
     if (base->library.lib_OpenCnt != 0) {
         base->library.lib_OpenCnt--;
@@ -94,7 +95,7 @@ amtls_close(struct AmTLSLibraryBase *base asm("a6"))
 }
 
 static BPTR __attribute__((used))
-amtls_expunge(struct AmTLSLibraryBase *base asm("a6"))
+amtls_expunge(struct AmTLSLibraryBase *base __asm__("a6"))
 {
     return amtls_do_expunge(base);
 }
