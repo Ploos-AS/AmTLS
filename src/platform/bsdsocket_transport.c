@@ -1,6 +1,9 @@
 #include "platform/bsdsocket_transport.h"
 
 #ifdef __amigaos__
+/* The AmigaOS NDK socket prototypes use ssize_t but do not make its
+ * definition visible through proto/bsdsocket.h on every Bebbo setup. */
+#include <sys/types.h>
 #include <proto/bsdsocket.h>
 #else
 #include <errno.h>
@@ -28,7 +31,14 @@ static long bsdsocket_write(void *user, const void *buffer, size_t length)
     if (state == NULL || state->socket_fd < 0 || buffer == NULL) {
         return -1;
     }
+#ifdef __amigaos__
+    /* Some classic NDK variants declare send() with a non-const buffer.
+     * send() does not modify the payload; keep the generic transport API
+     * const-correct and isolate the legacy prototype mismatch here. */
+    rc = (long)send(state->socket_fd, (void *)buffer, length, 0);
+#else
     rc = (long)send(state->socket_fd, buffer, length, 0);
+#endif
     return rc;
 }
 
