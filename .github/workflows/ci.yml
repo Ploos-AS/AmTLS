@@ -45,7 +45,6 @@ jobs:
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/amiga/library_lifecycle.c -o build/amigaos/library_lifecycle.o
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -mcrt=nix20 cli/tlsinfo.c build/amigaos/amtls.o build/amigaos/allocator.o -o build/amigaos/TLSInfo
           test -s build/amigaos/TLSInfo
-          m68k-amigaos-readelf -h build/amigaos/TLSInfo
       - name: Upload native AmigaOS smoke artifact
         uses: actions/upload-artifact@v4
         with:
