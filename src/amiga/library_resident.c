@@ -2,7 +2,6 @@
 #include <exec/resident.h>
 #include <exec/types.h>
 #include <dos/dos.h>
-#include <proto/exec.h>
 
 #define STR_(x) #x
 #define STR(x) STR_(x)
@@ -18,8 +17,8 @@ struct AmTLSLibraryBase {
     struct ExecBase *sys_base;
 };
 
-static char library_name[] = AMTLS_NAME;
-static char library_id[] = "amtls.library 0.1\r\n";
+char library_name[] __attribute__((used)) = AMTLS_NAME;
+char library_id[] __attribute__((used)) = "amtls.library 0.1\r\n";
 
 int __attribute__((no_reorder)) _start(void)
 {
@@ -41,9 +40,35 @@ __asm__("amtls_romtag:                         \n"
         "       dc.l    amtls_auto_init        \n"
         "amtls_endcode:                        \n");
 
+static void exec_remove(struct ExecBase *sys_base, struct Node *node)
+{
+    register struct ExecBase *a6 __asm__("a6") = sys_base;
+    register struct Node *a1 __asm__("a1") = node;
+
+    __asm__ volatile("jsr -252(a6)"
+                     :
+                     : "r"(a6), "r"(a1)
+                     : "d0", "d1", "a0", "a1", "cc", "memory");
+}
+
+static void exec_free_mem(struct ExecBase *sys_base, APTR memory, ULONG size)
+{
+    register struct ExecBase *a6 __asm__("a6") = sys_base;
+    register APTR a1 __asm__("a1") = memory;
+    register ULONG d0 __asm__("d0") = size;
+
+    __asm__ volatile("jsr -210(a6)"
+                     :
+                     : "r"(a6), "r"(a1), "r"(d0)
+                     : "d1", "a0", "a1", "cc", "memory");
+}
+
 static BPTR amtls_do_expunge(struct AmTLSLibraryBase *base)
 {
     BPTR seg_list;
+    ULONG total_size;
+    UBYTE *allocation;
+    struct ExecBase *sys_base;
 
     if (base->library.lib_OpenCnt != 0) {
         base->library.lib_Flags |= LIBF_DELEXP;
@@ -51,9 +76,13 @@ static BPTR amtls_do_expunge(struct AmTLSLibraryBase *base)
     }
 
     seg_list = base->seg_list;
-    Remove(&base->library.lib_Node);
-    FreeMem((UBYTE *)base - base->library.lib_NegSize,
-            base->library.lib_NegSize + base->library.lib_PosSize);
+    sys_base = base->sys_base;
+    total_size = (ULONG)base->library.lib_NegSize +
+                 (ULONG)base->library.lib_PosSize;
+    allocation = (UBYTE *)base - base->library.lib_NegSize;
+
+    exec_remove(sys_base, &base->library.lib_Node);
+    exec_free_mem(sys_base, allocation, total_size);
     return seg_list;
 }
 
@@ -106,7 +135,7 @@ amtls_reserved(void)
     return 0;
 }
 
-static const ULONG amtls_vectors[] = {
+static const ULONG amtls_vectors[] __attribute__((used)) = {
     (ULONG)amtls_open,
     (ULONG)amtls_close,
     (ULONG)amtls_expunge,
@@ -114,7 +143,7 @@ static const ULONG amtls_vectors[] = {
     (ULONG)-1
 };
 
-const ULONG amtls_auto_init[4] = {
+const ULONG amtls_auto_init[4] __attribute__((used)) = {
     sizeof(struct AmTLSLibraryBase),
     (ULONG)amtls_vectors,
     0,
