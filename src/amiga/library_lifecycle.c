@@ -1,7 +1,7 @@
 #include "amtls/library.h"
 
 static const char library_id[] =
-    "amtls.library 0.1 (15.09.2026)\r\n";
+    "amtls.library 0.1\r\n";
 
 int amtls_library_init(AmTLS_LibraryState *state)
 {
