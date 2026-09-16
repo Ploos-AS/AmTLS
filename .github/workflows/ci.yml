@@ -37,13 +37,14 @@ jobs:
         run: |
           mkdir -p build/amigaos
           CFLAGS='-Os -Wall -Wextra -Werror -std=c99 -m68000 -msoft-float'
+          RESIDENT_CFLAGS='-Os -Wall -Wextra -Werror -std=gnu99 -m68000 -msoft-float -fomit-frame-pointer -Wno-unused-parameter -Wno-volatile-register-var'
           CPPFLAGS='-Iinclude -Isrc'
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/amtls.c -o build/amigaos/amtls.o
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/platform/allocator.c -o build/amigaos/allocator.o
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/backends/handshake_pump.c -o build/amigaos/handshake_pump.o
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/platform/bsdsocket_transport.c -o build/amigaos/bsdsocket_transport.o
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/amiga/library_lifecycle.c -o build/amigaos/library_lifecycle.o
-          m68k-amigaos-gcc $CPPFLAGS $CFLAGS -fomit-frame-pointer -Wno-unused-parameter -Wno-volatile-register-var -c src/amiga/library_resident.c -o build/amigaos/library_resident.o
+          m68k-amigaos-gcc $CPPFLAGS $RESIDENT_CFLAGS -c src/amiga/library_resident.c -o build/amigaos/library_resident.o
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -mcrt=nix20 cli/tlsinfo.c build/amigaos/amtls.o build/amigaos/allocator.o -o build/amigaos/TLSInfo
           m68k-amigaos-gcc -m68000 -nostdlib -nostartfiles -Wl,-Map=build/amigaos/amtls.library.map -o build/amigaos/amtls.library build/amigaos/library_resident.o
           test -s build/amigaos/TLSInfo
