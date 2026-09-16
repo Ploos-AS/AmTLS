@@ -43,13 +43,19 @@ jobs:
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/backends/handshake_pump.c -o build/amigaos/handshake_pump.o
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/platform/bsdsocket_transport.c -o build/amigaos/bsdsocket_transport.o
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -c src/amiga/library_lifecycle.c -o build/amigaos/library_lifecycle.o
+          m68k-amigaos-gcc $CPPFLAGS $CFLAGS -fomit-frame-pointer -Wno-unused-parameter -Wno-volatile-register-var -c src/amiga/library_resident.c -o build/amigaos/library_resident.o
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -mcrt=nix20 cli/tlsinfo.c build/amigaos/amtls.o build/amigaos/allocator.o -o build/amigaos/TLSInfo
+          m68k-amigaos-gcc -m68000 -nostdlib -nostartfiles -Wl,-Map=build/amigaos/amtls.library.map -o build/amigaos/amtls.library build/amigaos/library_resident.o
           test -s build/amigaos/TLSInfo
-      - name: Upload native AmigaOS smoke artifact
+          test -s build/amigaos/amtls.library
+      - name: Upload native AmigaOS smoke artifacts
         uses: actions/upload-artifact@v4
         with:
           name: amtls-amigaos-native-smoke
-          path: build/amigaos/TLSInfo
+          path: |
+            build/amigaos/TLSInfo
+            build/amigaos/amtls.library
+            build/amigaos/amtls.library.map
           if-no-files-found: error
 
   bearssl-probe:
