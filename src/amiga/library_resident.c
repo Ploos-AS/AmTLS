@@ -3,9 +3,6 @@
 #include <exec/types.h>
 #include <dos/dos.h>
 
-#define STR_(x) #x
-#define STR(x) STR_(x)
-
 #define AMTLS_NAME "amtls.library"
 #define AMTLS_VERSION 0
 #define AMTLS_REVISION 1
@@ -17,28 +14,52 @@ struct AmTLSLibraryBase {
     struct ExecBase *sys_base;
 };
 
-char library_name[] __attribute__((used)) = AMTLS_NAME;
-char library_id[] __attribute__((used)) = "amtls.library 0.1\r\n";
+static char library_name[] = AMTLS_NAME;
+static char library_id[] = "amtls.library 0.1\r\n";
+
+static struct AmTLSLibraryBase *amtls_init(
+    struct ExecBase *sys_base __asm__("a6"),
+    BPTR seg_list __asm__("a0"),
+    struct AmTLSLibraryBase *base __asm__("d0"));
+static struct AmTLSLibraryBase *amtls_open(
+    struct AmTLSLibraryBase *base __asm__("a6"));
+static BPTR amtls_close(struct AmTLSLibraryBase *base __asm__("a6"));
+static BPTR amtls_expunge(struct AmTLSLibraryBase *base __asm__("a6"));
+static ULONG amtls_reserved(void);
+
+static const APTR amtls_vectors[] = {
+    (APTR)amtls_open,
+    (APTR)amtls_close,
+    (APTR)amtls_expunge,
+    (APTR)amtls_reserved,
+    (APTR)-1
+};
+
+static const ULONG amtls_auto_init[4] = {
+    sizeof(struct AmTLSLibraryBase),
+    (ULONG)amtls_vectors,
+    0,
+    (ULONG)amtls_init
+};
+
+static const struct Resident amtls_romtag
+    __attribute__((used, section(".text"))) = {
+        RTC_MATCHWORD,
+        (struct Resident *)&amtls_romtag,
+        (APTR)(&amtls_romtag + 1),
+        RTF_AUTOINIT,
+        AMTLS_VERSION,
+        NT_LIBRARY,
+        AMTLS_PRIORITY,
+        library_name,
+        library_id,
+        (APTR)amtls_auto_init
+    };
 
 int __attribute__((no_reorder)) _start(void)
 {
     return -1;
 }
-
-extern const ULONG amtls_auto_init[4];
-
-__asm__("amtls_romtag:                         \n"
-        "       dc.w    " STR(RTC_MATCHWORD) " \n"
-        "       dc.l    amtls_romtag           \n"
-        "       dc.l    amtls_endcode          \n"
-        "       dc.b    " STR(RTF_AUTOINIT) "  \n"
-        "       dc.b    " STR(AMTLS_VERSION) " \n"
-        "       dc.b    " STR(NT_LIBRARY) "    \n"
-        "       dc.b    " STR(AMTLS_PRIORITY) "\n"
-        "       dc.l    library_name           \n"
-        "       dc.l    library_id             \n"
-        "       dc.l    amtls_auto_init        \n"
-        "amtls_endcode:                        \n");
 
 static void exec_remove(struct ExecBase *sys_base, struct Node *node)
 {
@@ -86,7 +107,7 @@ static BPTR amtls_do_expunge(struct AmTLSLibraryBase *base)
     return seg_list;
 }
 
-static struct AmTLSLibraryBase * __attribute__((used))
+static struct AmTLSLibraryBase *
 amtls_init(struct ExecBase *sys_base __asm__("a6"),
            BPTR seg_list __asm__("a0"),
            struct AmTLSLibraryBase *base __asm__("d0"))
@@ -102,7 +123,7 @@ amtls_init(struct ExecBase *sys_base __asm__("a6"),
     return base;
 }
 
-static struct AmTLSLibraryBase * __attribute__((used))
+static struct AmTLSLibraryBase *
 amtls_open(struct AmTLSLibraryBase *base __asm__("a6"))
 {
     base->library.lib_OpenCnt++;
@@ -110,8 +131,7 @@ amtls_open(struct AmTLSLibraryBase *base __asm__("a6"))
     return base;
 }
 
-static BPTR __attribute__((used))
-amtls_close(struct AmTLSLibraryBase *base __asm__("a6"))
+static BPTR amtls_close(struct AmTLSLibraryBase *base __asm__("a6"))
 {
     if (base->library.lib_OpenCnt != 0) {
         base->library.lib_OpenCnt--;
@@ -123,29 +143,12 @@ amtls_close(struct AmTLSLibraryBase *base __asm__("a6"))
     return 0;
 }
 
-static BPTR __attribute__((used))
-amtls_expunge(struct AmTLSLibraryBase *base __asm__("a6"))
+static BPTR amtls_expunge(struct AmTLSLibraryBase *base __asm__("a6"))
 {
     return amtls_do_expunge(base);
 }
 
-static ULONG __attribute__((used))
-amtls_reserved(void)
+static ULONG amtls_reserved(void)
 {
     return 0;
 }
-
-static const ULONG amtls_vectors[] __attribute__((used)) = {
-    (ULONG)amtls_open,
-    (ULONG)amtls_close,
-    (ULONG)amtls_expunge,
-    (ULONG)amtls_reserved,
-    (ULONG)-1
-};
-
-const ULONG amtls_auto_init[4] __attribute__((used)) = {
-    sizeof(struct AmTLSLibraryBase),
-    (ULONG)amtls_vectors,
-    0,
-    (ULONG)amtls_init
-};
