@@ -16,7 +16,7 @@ struct Library *SocketBase = NULL;
 int main(void)
 {
     const unsigned char *host_name = (const unsigned char *)"example.com";
-    struct hostent *host;
+    const struct hostent *host;
     struct sockaddr_in address;
     int fd = -1;
     AmTLS_BSDSocketTransport state;
