@@ -15,7 +15,7 @@ struct Library *SocketBase = NULL;
 
 int main(void)
 {
-    char host_name[] = "example.com";
+    unsigned char host_name[] = "example.com";
     struct hostent *host;
     struct sockaddr_in address;
     int fd = -1;
