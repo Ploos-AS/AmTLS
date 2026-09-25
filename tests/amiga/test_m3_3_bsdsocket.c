@@ -1,6 +1,7 @@
 #include <exec/types.h>
 #include <exec/libraries.h>
 #include <proto/exec.h>
+#include <proto/dos.h>
 #include <proto/bsdsocket.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -27,7 +28,7 @@ int main(void)
         return 20;
     }
 
-    host = gethostbyname("example.com");
+    host = (struct hostent *)gethostbyname((const unsigned char *)"example.com");
     if (host == NULL || host->h_addr_list == NULL || host->h_addr_list[0] == NULL) {
         PutStr("AmTLS M3.3b: FAIL DNS\n");
         CloseLibrary(SocketBase);
