@@ -33,7 +33,6 @@ jobs:
           m68k-amigaos-gcc --version
           test -f /opt/m68k-amigaos/m68k-amigaos/ndk-include/proto/bsdsocket.h || \
             test -f /opt/m68k-amigaos/m68k-amigaos/sys-include/proto/bsdsocket.h
-          grep -R -n 'gethostbyname' /opt/m68k-amigaos/m68k-amigaos/ndk-include /opt/m68k-amigaos/m68k-amigaos/sys-include 2>/dev/null | head -20 || true
       - name: Compile native AmigaOS 68000 objects
         run: |
           mkdir -p build/amigaos
