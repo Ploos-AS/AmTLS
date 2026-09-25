@@ -71,6 +71,7 @@ jobs:
           path: |
             build/amigaos/TLSInfo
             build/amigaos/test_m3_3_openclose
+            build/amigaos/test_m3_3_bsdsocket
             build/amigaos/amtls.library
             build/amigaos/amtls.library.map
             build/m3_3_runtime/
