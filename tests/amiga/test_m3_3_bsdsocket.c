@@ -15,7 +15,7 @@ struct Library *SocketBase = NULL;
 
 int main(void)
 {
-    struct hostent *host;
+    const struct hostent *host;
     struct sockaddr_in address;
     int fd = -1;
     AmTLS_BSDSocketTransport state;
@@ -28,7 +28,7 @@ int main(void)
         return 20;
     }
 
-    host = (struct hostent *)gethostbyname((const unsigned char *)"example.com");
+    host = gethostbyname((const unsigned char *)"example.com");
     if (host == NULL || host->h_addr_list == NULL || host->h_addr_list[0] == NULL) {
         PutStr("AmTLS M3.3b: FAIL DNS\n");
         CloseLibrary(SocketBase);
