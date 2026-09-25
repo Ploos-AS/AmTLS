@@ -51,6 +51,13 @@ jobs:
           test -s build/amigaos/TLSInfo
           test -s build/amigaos/test_m3_3_openclose
           test -s build/amigaos/amtls.library
+      - name: Stage M3.3 runtime payload
+        run: |
+          chmod +x tools/stage_m3_3_runtime.sh
+          tools/stage_m3_3_runtime.sh
+          test -s build/m3_3_runtime/Libs/amtls.library
+          test -s build/m3_3_runtime/C/test_m3_3_openclose
+          grep -q AMTLS_M3_3_PASS build/m3_3_runtime/S/Startup-Sequence
       - name: Upload native AmigaOS smoke artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -60,6 +67,7 @@ jobs:
             build/amigaos/test_m3_3_openclose
             build/amigaos/amtls.library
             build/amigaos/amtls.library.map
+            build/m3_3_runtime/
           if-no-files-found: error
 
   bearssl-probe:
