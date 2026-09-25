@@ -57,6 +57,8 @@ jobs:
           tools/stage_m3_3_runtime.sh
           test -s build/m3_3_runtime/Libs/amtls.library
           test -s build/m3_3_runtime/C/test_m3_3_openclose
+          test -s build/m3_3_runtime/amiga-runtime.json
+          python3 -m json.tool build/m3_3_runtime/amiga-runtime.json >/dev/null
           grep -q AMTLS_M3_3_PASS build/m3_3_runtime/S/Startup-Sequence
       - name: Upload native AmigaOS smoke artifacts
         uses: actions/upload-artifact@v4
