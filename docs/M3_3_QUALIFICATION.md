@@ -16,11 +16,11 @@ The native test `tests/amiga/test_m3_3_openclose.c`:
 
 The test is cross-built by the `amigaos-native` CI job.
 
-Build/staging gate: **PASS** (GitHub Actions run #128, commit `9af0dfa`). This is build evidence only, not classic AmigaOS runtime evidence.
+Build/staging gate: **PASS** (GitHub Actions run #130, including the bidirectional M3.3b transport smoke). This is build evidence only, not classic AmigaOS runtime evidence.
 
 ## M3.3b — bsdsocket DNS/TCP smoke
 
-The native test `tests/amiga/test_m3_3_bsdsocket.c` opens `bsdsocket.library`, resolves `example.com`, establishes a TCP connection to port 80, exercises the AmTLS bsdsocket transport, and emits `AMTLS_M3_3B_PASS` on success. The current endpoint is an external smoke-test dependency and is not yet considered deterministic qualification infrastructure.
+The native test `tests/amiga/test_m3_3_bsdsocket.c` opens `bsdsocket.library`, resolves `example.com`, establishes a TCP connection to port 80, exercises both the write and read paths of the AmTLS bsdsocket transport, and emits `AMTLS_M3_3B_PASS` on success. The current endpoint is an external smoke-test dependency and is not yet considered deterministic qualification infrastructure.
 
 The staged contract declares `network: true` and `bsdsocket_library: true`; the shared classic FS-UAE backend enables `bsdsocket_library = 1` from that requirement.
 
