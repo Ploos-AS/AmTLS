@@ -15,8 +15,8 @@ struct Library *SocketBase = NULL;
 
 int main(void)
 {
-    const unsigned char *host_name = (const unsigned char *)"example.com";
-    const struct hostent * const *host;
+    char host_name[] = "example.com";
+    struct hostent *host;
     struct sockaddr_in address;
     int fd = -1;
     AmTLS_BSDSocketTransport state;
@@ -30,7 +30,7 @@ int main(void)
     }
 
     host = gethostbyname(host_name);
-    if (host == NULL || (*host)->h_addr_list == NULL || (*host)->h_addr_list[0] == NULL) {
+    if (host == NULL || host->h_addr_list == NULL || host->h_addr_list[0] == NULL) {
         PutStr("AmTLS M3.3b: FAIL DNS\n");
         CloseLibrary(SocketBase);
         return 20;
@@ -46,7 +46,7 @@ int main(void)
     memset(&address, 0, sizeof(address));
     address.sin_family = AF_INET;
     address.sin_port = htons(80);
-    memcpy(&address.sin_addr, (*host)->h_addr_list[0], host->h_length);
+    memcpy(&address.sin_addr, host->h_addr_list[0], host->h_length);
 
     if (connect(fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
         PutStr("AmTLS M3.3b: FAIL connect\n");
