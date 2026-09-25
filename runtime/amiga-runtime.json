@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "project": "AmTLS",
+  "milestone": "M3.3a",
+  "architecture": "m68k",
+  "cpu": "68000",
+  "os": "AmigaOS",
+  "minimum_os": "2.04",
+  "emulator_profiles": ["a500-os204", "a500plus-os2", "a1200-020-os3"],
+  "payload": {
+    "library": "Libs/amtls.library",
+    "program": "C/test_m3_3_openclose",
+    "script": "S/run-test"
+  },
+  "result": {
+    "log": "T/amtls-m3.3.log",
+    "required_lines": ["RC=0", "AMTLS_M3_3_PASS"]
+  },
+  "policy": {
+    "roms_in_repository": false,
+    "amigaos_files_in_repository": false
+  }
+}
