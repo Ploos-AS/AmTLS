@@ -16,6 +16,14 @@ The native test `tests/amiga/test_m3_3_openclose.c`:
 
 The test is cross-built by the `amigaos-native` CI job.
 
+Build/staging gate: **PASS** (GitHub Actions run #128, commit `9af0dfa`). This is build evidence only, not classic AmigaOS runtime evidence.
+
+## M3.3b — bsdsocket DNS/TCP smoke
+
+The native test `tests/amiga/test_m3_3_bsdsocket.c` opens `bsdsocket.library`, resolves `example.com`, establishes a TCP connection to port 80, exercises the AmTLS bsdsocket transport, and emits `AMTLS_M3_3B_PASS` on success. The current endpoint is an external smoke-test dependency and is not yet considered deterministic qualification infrastructure.
+
+The staged contract declares `network: true` and `bsdsocket_library: true`; the shared classic FS-UAE backend enables `bsdsocket_library = 1` from that requirement.
+
 ## FS-UAE harness
 
 `tools/stage_m3_3_runtime.sh` creates a ROM-free payload.
@@ -69,4 +77,4 @@ The staged payload includes `amiga-runtime.json` and can be consumed by the shar
 
 For classic AmigaOS, use the private/self-hosted `amiga-classic` runner documented by amiga-runtime. The initial gate is the `a500-os204` profile. Proprietary ROM and AmigaOS assets remain external to both repositories and are mounted read-only at runtime.
 
-M3.3a remains **IN PROGRESS** until runtime evidence from that classic guest records `RC=0` and `AMTLS_M3_3_PASS`.
+M3.3a/b remain **IN PROGRESS** until runtime evidence from that classic guest records the required successful result markers, including `RC=0`, `AMTLS_M3_3_PASS`, and `AMTLS_M3_3B_PASS`.
