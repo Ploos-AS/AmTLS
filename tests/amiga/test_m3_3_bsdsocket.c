@@ -21,7 +21,8 @@ int main(void)
     int fd = -1;
     AmTLS_BSDSocketTransport state;
     AmTLS_Transport transport;
-    const char request[] = "GET / HTTP/1.0\r\nHost: example.com\r\n\r\n";
+    const char request[] = "HEAD / HTTP/1.0\r\nHost: example.com\r\nConnection: close\r\n\r\n";
+    char response[16];
 
     SocketBase = OpenLibrary("bsdsocket.library", 4);
     if (SocketBase == NULL) {
@@ -56,7 +57,8 @@ int main(void)
     }
 
     if (amtls_bsdsocket_transport_init(&state, &transport, fd, 1) != 0 ||
-        transport.write(transport.user, request, sizeof(request) - 1) <= 0) {
+        transport.write(transport.user, request, sizeof(request) - 1) <= 0 ||
+        transport.read(transport.user, response, sizeof(response)) <= 0) {
         PutStr("AmTLS M3.3b: FAIL transport\n");
         CloseSocket(fd);
         CloseLibrary(SocketBase);
