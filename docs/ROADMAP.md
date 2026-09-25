@@ -82,10 +82,11 @@
 
 ### M3.2 — Native AmigaOS build and library lifecycle
 
-- [ ] define native AmigaOS build contract/toolchain target
-- [ ] implement `amtls.library` lifecycle/API skeleton
-- [ ] compile native AmigaOS/68000 library objects
-- [ ] add automated qualification where feasible
+- [x] define native AmigaOS build contract/toolchain target
+- [x] implement `amtls.library` lifecycle/API skeleton
+- [x] compile native AmigaOS/68000 library objects
+- [x] add automated qualification where feasible
+- [x] record qualification evidence in `docs/M3_2_QUALIFICATION.md`
 
 ### M3.3 — Runtime qualification
 
