@@ -20,6 +20,9 @@ test -s "$TEST"
 rm -rf "$OUT_DIR"
 mkdir -p "$OUT_DIR/Libs" "$OUT_DIR/C" "$OUT_DIR/S" "$OUT_DIR/T"
 
+test -s runtime/amiga-runtime.json
+cp runtime/amiga-runtime.json "$OUT_DIR/amiga-runtime.json"
+
 cp "$LIB" "$OUT_DIR/Libs/amtls.library"
 cp "$TEST" "$OUT_DIR/C/test_m3_3_openclose"
 
