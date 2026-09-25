@@ -62,3 +62,11 @@ FS-UAE is the first emulator target. Amiberry and FellowNG may be added after th
 ## PASS rule
 
 Do not mark M3.3 PASS merely because the executable cross-compiles or FS-UAE starts. PASS requires the marker produced by a running AmigaOS instance after the actual library lifecycle test completes successfully.
+
+## Shared amiga-runtime integration
+
+The staged payload includes `amiga-runtime.json` and can be consumed by the shared Ploos-AS `amiga-runtime` qualification service.
+
+For classic AmigaOS, use the private/self-hosted `amiga-classic` runner documented by amiga-runtime. The initial gate is the `a500-os204` profile. Proprietary ROM and AmigaOS assets remain external to both repositories and are mounted read-only at runtime.
+
+M3.3a remains **IN PROGRESS** until runtime evidence from that classic guest records `RC=0` and `AMTLS_M3_3_PASS`.
