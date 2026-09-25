@@ -64,6 +64,18 @@ jobs:
           test -s build/m3_3_runtime/S/run-test
           grep -q AMTLS_M3_3_PASS build/m3_3_runtime/S/run-test
           grep -q AMTLS_M3_3B_PASS build/m3_3_runtime/S/run-test
+      - name: Self-test M3.3 runtime verifier
+        run: |
+          chmod +x tools/verify_m3_3_runtime.sh
+          mkdir -p build/verifier-test
+          printf 'RC=0\nAMTLS_M3_3_PASS\n' > build/verifier-test/amtls-m3.3.log
+          printf 'RC=0\nAMTLS_M3_3B_PASS\n' > build/verifier-test/amtls-m3.3b.log
+          tools/verify_m3_3_runtime.sh build/verifier-test/amtls-m3.3.log build/verifier-test/amtls-m3.3b.log
+          printf 'RC=0\nAMTLS_M3_3B_FAIL\n' > build/verifier-test/amtls-m3.3b.log
+          if tools/verify_m3_3_runtime.sh build/verifier-test/amtls-m3.3.log build/verifier-test/amtls-m3.3b.log; then
+            echo "verifier accepted failing M3.3b evidence" >&2
+            exit 1
+          fi
       - name: Upload native AmigaOS smoke artifacts
         uses: actions/upload-artifact@v4
         with:
