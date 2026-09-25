@@ -31,6 +31,7 @@ cp "$BSDTEST" "$OUT_DIR/C/test_m3_3_bsdsocket"
 
 cat > "$OUT_DIR/S/run-test" <<'EOF'
 FailAt 21
+Assign LIBS: TEST:Libs ADD
 TEST:C/test_m3_3_openclose >TEST:T/amtls-m3.3.log
 SetEnv AmTLSRC $RC
 Echo "RC=$RC" >>TEST:T/amtls-m3.3.log
