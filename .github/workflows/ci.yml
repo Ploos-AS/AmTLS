@@ -47,9 +47,12 @@ jobs:
           m68k-amigaos-gcc $CPPFLAGS $RESIDENT_CFLAGS -c src/amiga/library_resident.c -o build/amigaos/library_resident.o
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -mcrt=nix20 cli/tlsinfo.c build/amigaos/amtls.o build/amigaos/allocator.o -o build/amigaos/TLSInfo
           m68k-amigaos-gcc $CPPFLAGS $CFLAGS -mcrt=nix20 tests/amiga/test_m3_3_openclose.c -o build/amigaos/test_m3_3_openclose
+            build/amigaos/test_m3_3_bsdsocket
+          m68k-amigaos-gcc $CPPFLAGS $CFLAGS -mcrt=nix20 tests/amiga/test_m3_3_bsdsocket.c build/amigaos/bsdsocket_transport.o -o build/amigaos/test_m3_3_bsdsocket
           m68k-amigaos-gcc -m68000 -nostdlib -nostartfiles -Wl,-Map=build/amigaos/amtls.library.map -o build/amigaos/amtls.library build/amigaos/library_resident.o
           test -s build/amigaos/TLSInfo
           test -s build/amigaos/test_m3_3_openclose
+          test -s build/amigaos/test_m3_3_bsdsocket
           test -s build/amigaos/amtls.library
       - name: Stage M3.3 runtime payload
         run: |
