@@ -1,23 +1,43 @@
 {
   "schema": 1,
   "project": "AmTLS",
-  "milestone": "M3.3a",
+  "milestone": "M3.3a-b",
   "architecture": "m68k",
   "cpu": "68000",
   "os": "AmigaOS",
   "minimum_os": "2.04",
-  "emulator_profiles": ["a500-os204", "a500plus-os2", "a1200-020-os3"],
+  "emulator_profiles": [
+    "a500-os204",
+    "a500plus-os2",
+    "a1200-020-os3"
+  ],
   "payload": {
     "library": "Libs/amtls.library",
     "program": "C/test_m3_3_openclose",
-    "script": "S/run-test"
+    "script": "S/run-test",
+    "programs": [
+      "C/test_m3_3_openclose",
+      "C/test_m3_3_bsdsocket"
+    ]
   },
   "result": {
     "log": "T/amtls-m3.3.log",
-    "required_lines": ["RC=0", "AMTLS_M3_3_PASS"]
+    "required_lines": [
+      "RC=0",
+      "AMTLS_M3_3_PASS",
+      "AMTLS_M3_3B_PASS"
+    ],
+    "logs": [
+      "T/amtls-m3.3.log",
+      "T/amtls-m3.3b.log"
+    ]
   },
   "policy": {
     "roms_in_repository": false,
     "amigaos_files_in_repository": false
+  },
+  "requirements": {
+    "network": true,
+    "bsdsocket_library": true
   }
 }
