@@ -29,23 +29,23 @@ cp "$LIB" "$OUT_DIR/Libs/amtls.library"
 cp "$TEST" "$OUT_DIR/C/test_m3_3_openclose"
 cp "$BSDTEST" "$OUT_DIR/C/test_m3_3_bsdsocket"
 
-cat > "$OUT_DIR/S/Startup-Sequence" <<'EOF'
+cat > "$OUT_DIR/S/run-test" <<'EOF'
 FailAt 21
-C:test_m3_3_openclose >T:amtls-m3.3.log
+TEST:C/test_m3_3_openclose >TEST:T/amtls-m3.3.log
 SetEnv AmTLSRC $RC
-Echo "RC=$RC" >>T:amtls-m3.3.log
+Echo "RC=$RC" >>TEST:T/amtls-m3.3.log
 If $RC EQ 0
-  Echo "AMTLS_M3_3_PASS" >>T:amtls-m3.3.log
+  Echo "AMTLS_M3_3_PASS" >>TEST:T/amtls-m3.3.log
 Else
-  Echo "AMTLS_M3_3_FAIL" >>T:amtls-m3.3.log
+  Echo "AMTLS_M3_3_FAIL" >>TEST:T/amtls-m3.3.log
 EndIf
 
-C:test_m3_3_bsdsocket >T:amtls-m3.3b.log
-Echo "RC=$RC" >>T:amtls-m3.3b.log
+TEST:C/test_m3_3_bsdsocket >TEST:T/amtls-m3.3b.log
+Echo "RC=$RC" >>TEST:T/amtls-m3.3b.log
 If $RC EQ 0
-  Echo "AMTLS_M3_3B_PASS" >>T:amtls-m3.3b.log
+  Echo "AMTLS_M3_3B_PASS" >>TEST:T/amtls-m3.3b.log
 Else
-  Echo "AMTLS_M3_3B_FAIL" >>T:amtls-m3.3b.log
+  Echo "AMTLS_M3_3B_FAIL" >>TEST:T/amtls-m3.3b.log
 EndIf
 EOF
 
@@ -54,7 +54,7 @@ AmTLS M3.3 runtime payload
 
 Mount this directory in a legal AmigaOS runtime with its Libs/ directory
 available as LIBS: and C/ available as C:, or copy the files into a test
-volume before executing S/Startup-Sequence.
+volume before executing S/run-test.
 
 Expected success markers:
   AMTLS_M3_3_PASS
