@@ -41,7 +41,7 @@ Inside AmigaOS run:
 Execute TEST:S/run-test
 ```
 
-The harness writes `TEST:T/amtls-m3.3.log`. Qualification requires both:
+The harness writes `TEST:T/amtls-m3.3.log` and `TEST:T/amtls-m3.3b.log`. Qualification requires the complete M3.3a/b evidence set:
 
 ```
 RC=0
@@ -51,7 +51,7 @@ AMTLS_M3_3_PASS
 The host-side verifier is:
 
 ```sh
-tools/verify_m3_3_runtime.sh build/m3_3_fsuae/Test/T/amtls-m3.3.log
+tools/verify_m3_3_runtime.sh build/m3_3_fsuae/Test/T/amtls-m3.3.log build/m3_3_fsuae/Test/T/amtls-m3.3b.log
 ```
 
 ## Target matrix
@@ -86,8 +86,10 @@ Use the staged directory itself as the project payload; do not reconstruct it fr
 
 On the private `amiga-classic` runner, obtain the `build/m3_3_runtime/` directory from the successful AmTLS CI artifact and invoke the shared `Ploos-AS/amiga-runtime` workflow **Classic AmigaOS qualification** with:
 
-- `payload_path`: absolute path to that `m3_3_runtime` directory on the runner
+- `payload_path`: absolute path to that `m3_3_runtime` directory on the runner, **or** `payload_artifact_url` for the CI artifact ZIP
 - `profile`: `a500-os204`
+
+For cross-repository artifact handoff, prefer the GitHub Actions API ZIP form `https://api.github.com/repos/Ploos-AS/AmTLS/actions/artifacts/<artifact-id>/zip`. Discover the current artifact ID from the successful AmTLS run rather than committing it here: Actions artifacts expire and IDs are not stable. The `amiga-runtime` workflow accepts an optional read-only `CLASSIC_PAYLOAD_TOKEN` for this download.
 
 The runner supplies `AMIGA_RUNTIME_KICKSTART_ROM` and `AMIGA_RUNTIME_SYSTEM_DIR` privately. Neither value nor the referenced files belong in AmTLS artifacts, logs, or the repository.
 
