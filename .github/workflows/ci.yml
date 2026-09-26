@@ -64,6 +64,9 @@ jobs:
           test -s build/m3_3_runtime/S/run-test
           grep -q AMTLS_M3_3_PASS build/m3_3_runtime/S/run-test
           grep -q AMTLS_M3_3B_PASS build/m3_3_runtime/S/run-test
+          grep -q 'SetEnv AmTLSM33A' build/m3_3_runtime/S/run-test
+          grep -q 'SetEnv AmTLSM33B' build/m3_3_runtime/S/run-test
+          grep -q 'Quit 20' build/m3_3_runtime/S/run-test
       - name: Self-test M3.3 runtime verifier
         run: |
           chmod +x tools/verify_m3_3_runtime.sh
