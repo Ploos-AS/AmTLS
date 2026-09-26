@@ -33,7 +33,7 @@ cat > "$OUT_DIR/S/run-test" <<'EOF'
 FailAt 21
 Assign LIBS: TEST:Libs ADD
 TEST:C/test_m3_3_openclose >TEST:T/amtls-m3.3.log
-SetEnv AmTLSRC $RC
+SetEnv AmTLSM33A $RC
 Echo "RC=$RC" >>TEST:T/amtls-m3.3.log
 If $RC EQ 0
   Echo "AMTLS_M3_3_PASS" >>TEST:T/amtls-m3.3.log
@@ -42,12 +42,20 @@ Else
 EndIf
 
 TEST:C/test_m3_3_bsdsocket >TEST:T/amtls-m3.3b.log
+SetEnv AmTLSM33B $RC
 Echo "RC=$RC" >>TEST:T/amtls-m3.3b.log
 If $RC EQ 0
   Echo "AMTLS_M3_3B_PASS" >>TEST:T/amtls-m3.3b.log
 Else
   Echo "AMTLS_M3_3B_FAIL" >>TEST:T/amtls-m3.3b.log
 EndIf
+
+If $AmTLSM33A EQ 0
+  If $AmTLSM33B EQ 0
+    Quit 0
+  EndIf
+EndIf
+Quit 20
 EOF
 
 cat > "$OUT_DIR/README.txt" <<'EOF'
